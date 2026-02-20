@@ -1,0 +1,6 @@
+Student Management System
+
+Functions:
+1. Add, Remove, Edit Student
+2. Add, Remove, Edit Class
+3. Calculate Grades

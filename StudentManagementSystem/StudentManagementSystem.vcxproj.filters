@@ -13,10 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\include">
+      <UniqueIdentifier>{e4e1f38b-35cb-4705-940b-2d640a70f1c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{7189dbc9-5149-4313-a558-28ed0201916a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\data">
+      <UniqueIdentifier>{e8418e64-e084-459c-97a6-76f47aa4cd10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="StudentManagementSystem.cpp">
-      <Filter>Source Files</Filter>
+    <Text Include="todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StudentManager.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
+    <ClCompile Include="SubjectView.h">
+      <Filter>Source Files\include</Filter>
+    </ClCompile>
+    <ClCompile Include="Student.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="StudentView.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="Subject.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassManager.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassView.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.h">
+      <Filter>Source Files\include</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Student.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentManager.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentView.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Subject.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="SubjectManager.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

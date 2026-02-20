@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -18,11 +18,29 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AudioBridge.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PlaylistManager.cpp" />
+    <ClCompile Include="src\Song.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="extern\miniaudio.h" />
+    <ClInclude Include="include\AudioBridge.h" />
+    <ClInclude Include="include\PlaylistManager.h" />
+    <ClInclude Include="include\Song.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6fd3bad2-33da-4d0d-978e-f88472873a52}</ProjectGuid>
-    <RootNamespace>StudentManagementSystem</RootNamespace>
+    <ProjectGuid>{56f7e2d7-18e7-4869-ab9d-5312b14c429a}</ProjectGuid>
+    <RootNamespace>MusicPlaylist</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -102,7 +120,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,28 +140,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Subject.cpp" />
-    <ClCompile Include="ClassManager.cpp" />
-    <ClCompile Include="ClassView.cpp" />
-    <ClCompile Include="SubjectView.h" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Student.cpp" />
-    <ClCompile Include="StudentManager.cpp" />
-    <ClCompile Include="StudentView.cpp" />
-    <ClCompile Include="Tools.cpp" />
-    <ClCompile Include="Tools.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="todo.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Subject.h" />
-    <ClInclude Include="SubjectManager.h" />
-    <ClInclude Include="Student.h" />
-    <ClInclude Include="StudentManager.h" />
-    <ClInclude Include="StudentView.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
