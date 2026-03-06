@@ -25,9 +25,11 @@ add_executable(MusicPlaylist
     include/AudioBridge.h
     include/PlaylistManager.h
     include/Song.h
-    # Add your QML resources (explained below)
+    
+    extern/miniaudio.h
+
     ui/resources.qrc 
- "extern/miniaudio.h")
+)
 
 # 5. Include Directories
 # Tells the compiler to look in /include and /extern for headers
