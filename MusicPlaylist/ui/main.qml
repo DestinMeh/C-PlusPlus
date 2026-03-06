@@ -12,60 +12,79 @@ ApplicationWindow {
         anchors.centerIn:parent
         spacing: 10
 
-        Button {
-            text: "Play"
-            onClicked: myAudioPlayer.play("path")
-        }
-
-        Button{
-            text: "Stop"
-            onClicked: myAudioPlayer.stop()
-        }
-        
-        Component{
-            id: songDelegate
-            Row {
-                Text{ text: model.title}
-                Button{ text: "Play"; onClicked: myAudioPlayer.play(model.filePath)}
-            }
-        }
-
-
-        FileDialog {
-            id: filePicker
-            title: "Select a Song"
-            currentFolder: StandardPaths.writableLocation(StandardPaths.MusicLocation)
-            onAccepted: {
-                // Challenge: Convert selectedFile to a local path and 
-                // call your C++ addToPlaylist() function here.
-                myAudioPlayer.addToPlaylist(filePicker.selectedFile)
-            }
-        }
-
-        Button {
-            text: "Add Song to Playlist"
-            onClicked: filePicker.open()
-        }
-
-        Text {
-            text: "Songs in Playlist: " + myAudioPlayer.playlistCount
-            font.pixelSize: 20
-            color: "white"
-        }
-
-        Row {
+        Row{
             spacing: 5
+
+            Button {
+                text: "Play"
+                onClicked: myAudioPlayer.play("path")
+            }
+
+            Button{
+                text: "Stop"
+                onClicked: myAudioPlayer.stop()
+            }
+        
+ 
+
+            FileDialog {
+                id: filePicker
+                title: "Select a Song"
+                currentFolder: StandardPaths.writableLocation(StandardPaths.MusicLocation)
+                onAccepted: {
+                    // Challenge: Convert selectedFile to a local path and 
+                    // call your C++ addToPlaylist() function here.
+                    myAudioPlayer.addToPlaylist(filePicker.selectedFile)
+                }
+            }
+
+
+            Button {
+                text: "Shuffle"
+                onClicked: myAudioPlayer.shuffle()
+            }
+
+            Button {
+                text: "Add Song to Playlist"
+                onClicked: filePicker.open()
+            }
+        }
+
+        Rectangle{
+            width: parent.width ; height: 200
+            color: "#222"
+            border.color: "white"
+            clip: true
             ListView{
-                width: parent.width
-                height: 200
-                model: myAudioPlay.playlistCount     
+                id: playlistView
+                anchors.fill: parent
+                model: myAudioPlayer.playlist     
+   
+
 
                 delegate: ItemDelegate{
-                    width: parent.width
-                    text: "Song #" + index
+                    width: playlistView.width
+                    
+                    contentItem: Text{
+                        text: modelData.split('/').pop()
+                        color: "black"
+                        leftPadding: 10
+                    }
+                    
                     onClicked: myAudioPlayer.playFromPlaylist(index)
                 }
             }
+        }
+
+        Text {
+            text: "Playing: " + myAudioPlayer.currentSongTitle
+            font.pixelSize: 10
+            color: "black"
+        }
+
+        Button{
+            text: "Clear Playlist"
+            onClicked: myAudioPlayer.clearPlaylist()
         }
     }
 }

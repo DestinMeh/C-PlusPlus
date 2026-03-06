@@ -7,15 +7,38 @@
 
 
 AudioBridge::AudioBridge(QObject* parent) : QObject(parent), m_isInitialized(false) {
-    // Initialize the audio engine
+    memset(&m_currentSound, 0, sizeof(ma_sound));
+
     if (ma_engine_init(NULL, &m_engine) == MA_SUCCESS) {
         m_isInitialized = true;
-        qDebug() << "Audio Engine started successfully!";
+        m_syncTimer = new QTimer(this);
+
+        connect(m_syncTimer, &QTimer::timeout, this, [this]() 
+            {
+                // This flag is your shield!
+                if (!m_songLoaded) return;
+
+                if (ma_sound_at_end(&m_currentSound)) {
+                    m_songLoaded = false;
+                    this->playNext();
+                }
+            }
+        );
+
+        // Only start if you want it polling; 
+        // alternatively, only start it inside the play() function.
+        m_syncTimer->start(500);
+
+        qDebug() << "Program is starting properly";
     }
 }
 
 AudioBridge::~AudioBridge() {
     if (m_isInitialized) {
+        m_syncTimer->stop();
+
+        ma_sound_uninit(&m_currentSound);
+
         ma_engine_uninit(&m_engine);
         
     }
@@ -24,15 +47,53 @@ AudioBridge::~AudioBridge() {
 void AudioBridge::play(const QString& path) {
     if (!m_isInitialized) return;
 
-    // Convert Qt string to standard C string for miniaudio
-    ma_engine_play_sound(&m_engine, path.toStdString().c_str(), NULL);
-    qDebug() << "Playing:" << path;
+    //Stop the timer so it doesn't poll during the transition
+    m_syncTimer->stop();
+
+    // IMPORTANT: Uninitialize the current sound
+    // This tells the engine to stop referencing this memory
+    ma_sound_uninit(&m_currentSound);
+
+    // Zero out the memory to prevent "garbage" pointers
+    memset(&m_currentSound, 0, sizeof(ma_sound));
+
+    // Load the new file and check for success
+    ma_result result = ma_sound_init_from_file(&m_engine,
+        path.toStdString().c_str(),
+        0, NULL, NULL, &m_currentSound);
+
+    if (result == MA_SUCCESS) {
+        ma_sound_start(&m_currentSound);
+
+        m_songLoaded = true;
+
+        m_currentSong = QFileInfo(path).fileName();
+        emit songTitleChanged();
+
+        //Only restart the heartbeat once the sound is safely loaded
+        m_syncTimer->start(500);
+    }
+    else {
+        qDebug() << "Miniaudio failed to load file. Error:" << (int)result;
+    }
 }
 
 void AudioBridge::stop() {
-    // For a simple start, we'll just stop all sounds
-    // Later, you can manage specific sound objects!
-    ma_engine_stop(&m_engine);
+    m_songLoaded = false;
+    ma_sound_stop(&m_currentSound);
+    m_currentSong = "Stopped";
+    emit songTitleChanged();
+    
+}
+
+void AudioBridge::playNext() {
+    m_currentIndex++;
+    if (m_currentIndex >= m_playlist.size()) {
+        m_currentIndex = 0;
+    }
+
+    this->play(m_playlist.at(m_currentIndex));
+    emit songTitleChanged();
 }
 
 void AudioBridge::addToPlaylist(const QUrl& url) {
@@ -59,6 +120,17 @@ void AudioBridge::playFromPlaylist(int index) {
         return;
     }
 
-    QString chosenSong = m_playlist.at(index);
-    this->play(chosenSong);
+    this->play(m_playlist.at(index));
+}
+
+void AudioBridge::clearPlaylist() {
+    m_playlist.clear();
+    emit playlistChanged();
+}
+
+void AudioBridge::shuffle() {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(m_playlist.begin(), m_playlist.end(), g);
+    emit playlistChanged();
 }
