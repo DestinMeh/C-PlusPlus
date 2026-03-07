@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QMap>
 #include "Song.h"
 
 struct PlaylistManager {
