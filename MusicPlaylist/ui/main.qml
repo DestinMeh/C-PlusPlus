@@ -41,8 +41,6 @@ ApplicationWindow {
                 title: "Select a Song"
                 currentFolder: StandardPaths.writableLocation(StandardPaths.MusicLocation)
                 onAccepted: {
-                    // Challenge: Convert selectedFile to a local path and 
-                    // call your C++ addToPlaylist() function here.
                     myAudioPlayer.addToPlaylist(filePicker.selectedFile)
                 }
             }
