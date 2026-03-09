@@ -33,6 +33,7 @@ public:
     Q_INVOKABLE void stop();
     Q_INVOKABLE void playNext();
     Q_INVOKABLE void togglePlay();
+    //Q_INVOKABLE void loadPlaylist();
     Q_INVOKABLE void addToPlaylist(const QUrl& url);
     Q_INVOKABLE void playFromPlaylist(int index);
     Q_INVOKABLE void clearPlaylist();

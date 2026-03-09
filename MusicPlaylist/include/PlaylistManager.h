@@ -1,11 +1,36 @@
 #pragma once
 
 #include <QMap>
+#include <QStringList>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFileInfo>
+
 #include "Song.h"
+#include "miniaudio.h"
 
-struct PlaylistManager {
-	QList<Song> playList;
+class PlaylistManager : public QObject {
+	Q_OBJECT
 
-	Q_INVOKABLE void addSong(QString path);
-	Q_INVOKABLE void getNextSong();
+	Q_PROPERTY(QStringList playlistNames READ playlistNames NOTIFY playlistNamesChanged)
+
+public:
+	Q_INVOKABLE void createPlaylist(const QString& name);
+	Q_INVOKABLE void addSongToPlaylist(const QString& playlistName,Song* newSong);
+	Q_INVOKABLE void saveToFile(const QString& fileName = "library.json");
+	Q_INVOKABLE void loadFromFile(const QString& fileName = "library.json");
+	
+
+	Song* createSongFromFile(const QString& path);
+	bool checkPlaylist(const QString& playlistName);
+
+	QStringList playlistNames() const { return m_allPlaylists.keys(); }
+	
+signals:
+	void playlistNamesChanged();
+
+private:
+	QMap<QString, QList<Song*> > m_allPlaylists;
 };
