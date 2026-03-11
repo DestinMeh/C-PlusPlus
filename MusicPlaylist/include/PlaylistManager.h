@@ -17,12 +17,16 @@ class PlaylistManager : public QObject {
 	Q_PROPERTY(QStringList playlistNames READ playlistNames NOTIFY playlistNamesChanged)
 
 public:
+	explicit PlaylistManager(QObject* parent = nullptr); 
+	virtual ~PlaylistManager();
+
 	Q_INVOKABLE void createPlaylist(const QString& name);
-	Q_INVOKABLE void addSongToPlaylist(const QString& playlistName,Song* newSong);
+	Q_INVOKABLE void addSongToPlaylist(const QString& playlistName, Song* newSong);
 	Q_INVOKABLE void saveToFile(const QString& fileName = "library.json");
 	Q_INVOKABLE void loadFromFile(const QString& fileName = "library.json");
 	
 
+	QList<Song*> loadPlaylist(const QString& playlistName);
 	Song* createSongFromFile(const QString& path);
 	bool checkPlaylist(const QString& playlistName);
 

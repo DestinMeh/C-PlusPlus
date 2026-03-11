@@ -1,5 +1,20 @@
 #include "PlaylistManager.h"
 
+PlaylistManager::PlaylistManager(QObject* parent)
+	: QObject(parent)
+{
+	// Good place to load your saved data automatically!
+	loadFromFile("library.json");
+}
+
+PlaylistManager::~PlaylistManager() {
+	// Loop through every list in the map and delete the song objects
+	for (auto it = m_allPlaylists.begin(); it != m_allPlaylists.end(); ++it) {
+		qDeleteAll(it.value());
+	}
+	m_allPlaylists.clear();
+}
+
 // Playlist Functions
 void PlaylistManager::createPlaylist(const QString& name) {
 	if (!m_allPlaylists.contains(name)) {
@@ -11,6 +26,15 @@ void PlaylistManager::createPlaylist(const QString& name) {
 		qDebug() << "Created new empty playlist";
 	}
 }
+QList<Song*> PlaylistManager::loadPlaylist(const QString& playlistName) {
+	if (!checkPlaylist(playlistName)) {
+		return QList<Song*>();
+	}
+
+	return m_allPlaylists[playlistName];
+}
+
+//Songs Functions
 void PlaylistManager::addSongToPlaylist(const QString& playlistName,Song* newSong) {
 	if (!newSong) return;
 
@@ -23,10 +47,8 @@ void PlaylistManager::addSongToPlaylist(const QString& playlistName,Song* newSon
 
 	emit playlistNamesChanged();
 	saveToFile();
-
-	
-
 }
+
 bool PlaylistManager::checkPlaylist(const QString& playlistName) {
 	if (m_allPlaylists.contains(playlistName)) {
 		return true;
@@ -51,6 +73,8 @@ void PlaylistManager::saveToFile(const QString& fileName) {
 			songData.insert("path", song->path());
 			songData.insert("title", song->title());
 			songData.insert("artist", song->artist());
+			songData.insert("duration", song->duration());
+			songData.insert("fileType", song->fileType());
 			songArray.append(songData);
 		}
 		root.insert(it.key(), songArray);
@@ -83,6 +107,8 @@ void PlaylistManager::loadFromFile(const QString& fileName) {
 				obj.value("path").toString(),
 				obj.value("title").toString(),
 				obj.value("artist").toString(),
+				obj.value("duration").toDouble(),
+				obj.value("fileType").toString(),
 				this
 			);
 			songs.append(newSong);
@@ -120,8 +146,8 @@ Song* PlaylistManager::createSongFromFile(const QString& path) {
 	Song* newSong = new Song(path,
 		title,
 		"Unknown Artist",
-		fileType,
 		duration,
+		fileType,
 		this);
 
 	return newSong;

@@ -9,13 +9,17 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QTimer>
+
+#include "PlaylistManager.h"
 #include "miniaudio.h" // We will put this in /extern
 
 class AudioBridge : public QObject {
     Q_OBJECT // This macro is REQUIRED for Qt magic to work
 
     //Properties
-    Q_PROPERTY(QStringList playlist READ getPlaylist NOTIFY playlistChanged)
+    Q_PROPERTY(PlaylistManager* playlistManager READ playlistManager CONSTANT)
+    Q_PROPERTY(QList<Song*> currentPlaylistObjects READ getCurrentPlaylistObjects NOTIFY playlistObjectChanged)
+    Q_PROPERTY(QStringList currentPlaylist READ getCurrentPlaylist NOTIFY playlistChanged)
     Q_PROPERTY(QString currentSongTitle READ getCurrentSongTitle NOTIFY songTitleChanged) // like like instance variable
     Q_PROPERTY(float volume READ volume WRITE setVolume NOTIFY volumeChanged)
     Q_PROPERTY(float songPosition READ songPosition NOTIFY songPositionChanged)
@@ -33,7 +37,7 @@ public:
     Q_INVOKABLE void stop();
     Q_INVOKABLE void playNext();
     Q_INVOKABLE void togglePlay();
-    //Q_INVOKABLE void loadPlaylist();
+    Q_INVOKABLE void loadPlaylist(const QString& playlistName);
     Q_INVOKABLE void addToPlaylist(const QUrl& url);
     Q_INVOKABLE void playFromPlaylist(int index);
     Q_INVOKABLE void clearPlaylist();
@@ -43,7 +47,9 @@ public:
     
 
 
-    QStringList getPlaylist() const { return m_playlist; }
+    PlaylistManager* playlistManager() { return &m_playlistManager; }
+    QList<Song*> getCurrentPlaylistObjects() { return m_currentPlaylistObjects;  }
+    QStringList getCurrentPlaylist() const { return m_currentPlaylist; }
     QString getCurrentSongTitle() const { return m_currentSong; }
     float volume() const { return m_volume; }
     float songPosition() const { return m_songPosition; }
@@ -51,11 +57,15 @@ public:
 
 
 signals:
-    void playlistChanged();
+    
     void songTitleChanged();
     void volumeChanged();
     void songPositionChanged();
     void songDurationChanged();
+    void playlistManagerChanged();
+
+    void playlistObjectChanged();
+    void playlistChanged();
     
 
 private:
@@ -64,7 +74,9 @@ private:
     bool m_isInitialized;
 
     //songs and playlist object instance
-    QStringList m_playlist;
+    PlaylistManager m_playlistManager;
+    QList<Song*> m_currentPlaylistObjects;
+    QStringList m_currentPlaylist;
     QString m_currentSong;
     ma_sound m_currentSound;
 

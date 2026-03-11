@@ -17,8 +17,8 @@ public:
 	explicit Song(const QString& path, 
 				const QString& title = "", 
 				const QString& artist = "Unknown", 
-				const QString& fileType,
-				const float& duration,
+				float duration = 0.0f,
+				const QString& fileType = "UNKNOWN",
 				QObject* parent = nullptr);
 
 	void updateMetadata(const QString& title, const QString& artist, float duration, const QString& type);
