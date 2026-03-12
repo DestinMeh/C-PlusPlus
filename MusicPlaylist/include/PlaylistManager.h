@@ -21,6 +21,7 @@ public:
 	virtual ~PlaylistManager();
 
 	Q_INVOKABLE void createPlaylist(const QString& name);
+	Q_INVOKABLE void deletePlaylist(const QString& name);
 	Q_INVOKABLE void addSongToPlaylist(const QString& playlistName, Song* newSong);
 	Q_INVOKABLE void saveToFile(const QString& fileName = "library.json");
 	Q_INVOKABLE void loadFromFile(const QString& fileName = "library.json");

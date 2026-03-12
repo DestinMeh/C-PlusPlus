@@ -16,14 +16,25 @@ PlaylistManager::~PlaylistManager() {
 }
 
 // Playlist Functions
-void PlaylistManager::createPlaylist(const QString& name) {
-	if (!m_allPlaylists.contains(name)) {
+void PlaylistManager::createPlaylist(const QString& playlistName) {
+	if (!m_allPlaylists.contains(playlistName)) {
 
-		m_allPlaylists.insert(name, QList<Song*>());
+		m_allPlaylists.insert(playlistName, QList<Song*>());
 
 		emit playlistNamesChanged();
 
 		qDebug() << "Created new empty playlist";
+	}
+}
+void PlaylistManager::deletePlaylist(const QString& playlistName) {
+	if (m_allPlaylists.contains(playlistName)) {
+		qDeleteAll(m_allPlaylists[playlistName]);
+		m_allPlaylists.remove(playlistName);
+
+		saveToFile();
+		emit playlistNamesChanged();
+
+		qDebug() << "Deleted playlist" << playlistName;
 	}
 }
 QList<Song*> PlaylistManager::loadPlaylist(const QString& playlistName) {

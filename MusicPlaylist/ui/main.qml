@@ -4,11 +4,14 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import "Helpers.js" as Logic
 
+
+
 ApplicationWindow {
     visible: true
     width: 640
     height: 480
     title: "Music Player"
+
     Row{
         anchors.fill: parent
 
@@ -27,6 +30,7 @@ ApplicationWindow {
    
 
                     delegate: ItemDelegate{
+                        id: playlistDelegate
                         width: playlistManager.width
                     
                         contentItem: Text{
@@ -36,6 +40,29 @@ ApplicationWindow {
                         }
                     
                         onClicked: myAudioPlayer.loadPlaylist(modelData)
+
+                        MouseArea{
+                            anchors.fill: parent
+                            acceptedButtons: Qt.RightButton
+                            onClicked: (mouse) => {
+                                if(mouse.button === Qt.RightButton) {
+                                    contextMenu.playlistNameToDelete = modelData
+                                    contextMenu.popup()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Menu {
+                id: contextMenu
+                property string playlistNameToDelete: ""
+
+                MenuItem {
+                    text: "Delete Playlist"
+                    onTriggered: {
+                        myAudioPlayer.playlistManager.deletePlaylist(contextMenu.playlistNameToDelete)
                     }
                 }
             }
