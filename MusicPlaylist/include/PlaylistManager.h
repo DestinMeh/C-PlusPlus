@@ -24,11 +24,12 @@ public:
 	Q_INVOKABLE void addSongToPlaylist(const QString& playlistName, Song* newSong);
 	Q_INVOKABLE void saveToFile(const QString& fileName = "library.json");
 	Q_INVOKABLE void loadFromFile(const QString& fileName = "library.json");
+	Q_INVOKABLE bool checkPlaylist(const QString& playlistName);
 	
-
+	void clearPlaylistSongs(const QString& playlistName);
 	QList<Song*> loadPlaylist(const QString& playlistName);
 	Song* createSongFromFile(const QString& path);
-	bool checkPlaylist(const QString& playlistName);
+	
 
 	QStringList playlistNames() const { return m_allPlaylists.keys(); }
 	

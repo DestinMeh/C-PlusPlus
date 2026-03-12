@@ -42,14 +42,60 @@ ApplicationWindow {
     
             Button{
                 text: "Add Playlist"
-                onClicked: myAudioPlayer.playlistManager.createPlaylist("New Playlist")
+                onClicked: addPlaylistDialog.open()
             }
+            
+            Dialog{
+                id: addPlaylistDialog
+                title: "Create New Playlist"
+                standardButtons: Dialog.Ok  | Dialog.Cancel
+                anchors.centerIn: parent
+
+                property bool nameExists: myAudioPlayer.playlistManager.checkPlaylist(newNameField.text)
+                
+                Column {
+                    spacing: 10
+                    Text { text: "Playlist Name:"}
+                    TextField{
+                        id: newNameField
+                        placeholderText: "Enter name..."    
+                        width: 150
+
+                        background: Rectangle{
+                            border.color: addPlaylistDialog.nameExists ? "red" : "gray"
+                            border.width: 1
+                        }
+                    }
+                    
+                    Text {
+                        text: "That playlist name already exists!"
+                        color: "red"
+                        visible: addPlaylistDialog.nameExists   
+                        font.pixelSize: 11
+                    }
+                }
+                
+                Component.onCompleted: {
+                    standardButton(Dialog.Ok).enabled = Qt.binding(function() { 
+                        return newNameField.text.length > 0 && !addPlaylistDialog.nameExists 
+                    })
+                }
+            
+                onAccepted: {
+                    myAudioPlayer.playlistManager.createPlaylist(newNameField.text)
+                    newNameField.text = ""
+                }
+            }
+        
         }
         Column{
             width: parent.width * 0.7
             spacing: 10
         
-            
+            Text{
+                text: myAudioPlayer.currentPlaylistName
+                font.pixelSize: 15
+            }
 
             Rectangle{
                 width: parent.width ; height: 200
@@ -59,7 +105,7 @@ ApplicationWindow {
                 ListView{
                     id: playlistView
                     anchors.fill: parent
-                    model: myAudioPlayer.currentPlaylistObjects     
+                    model: myAudioPlayer.currentPlaylistSongs     
    
 
 
@@ -122,10 +168,12 @@ ApplicationWindow {
             Column{
                 width: parent.width
                 spacing: 5
+              
 
                 Slider {
                     id: progressSlider
                     width: parent.width
+                    
                     from: 0
                     to: myAudioPlayer.songDuration
                     value: myAudioPlayer.songPosition

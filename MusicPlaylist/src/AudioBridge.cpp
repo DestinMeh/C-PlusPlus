@@ -13,11 +13,12 @@ AudioBridge::AudioBridge(QObject* parent) : QObject(parent), m_isInitialized(fal
         m_isInitialized = true;
         m_syncTimer = new QTimer(this);
         
-        connect(&m_playlistManager, &PlaylistManager::playlistNamesChanged, this, [this]() {
-            emit playlistChanged();         // Refreshes the QStringList property
-            emit playlistObjectChanged();   // Refreshes the QList<Song*> property
-         });
+        
+        //connect(&m_playlistManager, &PlaylistManager::playlistNamesChanged, this, [this]() {       // Refreshes the QStringList property
+        //    emit playlistSongsChanged();   // Refreshes the QList<Song*> property
+        // });
 
+        
         connect(m_syncTimer, &QTimer::timeout, this, [this]() 
             {
                 // This flag is your shield!
@@ -103,15 +104,15 @@ void AudioBridge::stop() {
     
 }
 void AudioBridge::playNext() {
-    if (m_currentPlaylistObjects.isEmpty()) return;
+    if (m_currentPlaylistSongs.isEmpty()) return;
 
     m_currentIndex++;
-    if (m_currentIndex >= m_currentPlaylistObjects.size()) {
+    if (m_currentIndex >= m_currentPlaylistSongs.size()) {
         m_currentIndex = 0;
     }
 
     // Use the Song object!
-    Song* nextSong = m_currentPlaylistObjects.at(m_currentIndex);
+    Song* nextSong = m_currentPlaylistSongs.at(m_currentIndex);
     this->play(nextSong->path());
 
     // Important: manually update title/duration for the UI
@@ -132,7 +133,7 @@ void AudioBridge::togglePlay() {
         }
     }
     // If no song is loaded, but we have songs in the object list
-    else if (!m_currentPlaylistObjects.isEmpty()) {
+    else if (!m_currentPlaylistSongs.isEmpty()) {
         // Use playFromPlaylist to ensure metadata signals (title, duration) are emitted
         this->playFromPlaylist(m_currentIndex);
     }
@@ -142,37 +143,31 @@ void AudioBridge::togglePlay() {
 // PLAYLIST FUNCTIONS
 void AudioBridge::loadPlaylist(const QString& playlistName) {
     
-    m_currentPlaylistObjects = m_playlistManager.loadPlaylist(playlistName);
-
-    // 2. Clear your simple QStringList (if you still use it for simple display)
-    m_currentPlaylist.clear();
-    for (Song* song : m_currentPlaylistObjects) {
-        m_currentPlaylist.append(song->title());
-    }
-
+    m_currentPlaylistSongs = m_playlistManager.loadPlaylist(playlistName);
+    m_currentPlaylistName = playlistName;
     
-    emit playlistChanged();
+    emit playlistSongsChanged();
 
-    qDebug() << "Loaded playlist:" << playlistName << "with" << m_currentPlaylistObjects.size() << "songs.";
+    qDebug() << "Loaded playlist:" << playlistName << "with" << m_currentPlaylistSongs.size() << "songs.";
 }
 void AudioBridge::addToPlaylist(const QUrl& url) {
     QString localPath = url.toLocalFile();
-
    
     Song* newSong = m_playlistManager.createSongFromFile(localPath);
 
-    
-    m_playlistManager.addSongToPlaylist("Default", newSong);
 
+    m_playlistManager.addSongToPlaylist(m_currentPlaylistName, newSong);
     
-    loadPlaylist("Default");
+    loadPlaylist(m_currentPlaylistName);
+
+    emit playlistSongsChanged();
     
 }
 void AudioBridge::playFromPlaylist(int index) {
 
-    if (index < 0 || index >= m_currentPlaylistObjects.size()) return;
+    if (index < 0 || index >= m_currentPlaylistSongs.size()) return;
 
-    Song* songToPlay = m_currentPlaylistObjects.at(index);
+    Song* songToPlay = m_currentPlaylistSongs.at(index);
     m_currentIndex = index;
 
     // Use the path from our object
@@ -188,20 +183,19 @@ void AudioBridge::playFromPlaylist(int index) {
 
 
 void AudioBridge::clearPlaylist() {
-    m_currentPlaylist.clear();
-    emit playlistChanged();
+    m_playlistManager.clearPlaylistSongs(m_currentPlaylistName);
+    m_currentPlaylistSongs.clear();
+
+    emit playlistSongsChanged();
 }
+
 void AudioBridge::shuffle() {
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(m_currentPlaylistObjects.begin(), m_currentPlaylistObjects.end(), g);
+    std::shuffle(m_currentPlaylistSongs.begin(), m_currentPlaylistSongs.end(), g);
 
-    m_currentPlaylist.clear();
-    for (Song* s : m_currentPlaylistObjects) {
-        m_currentPlaylist.append(s->title());
-    }
 
-    emit playlistObjectChanged();
+    emit playlistSongsChanged();
 }
 
 // VOLUME CONTROL

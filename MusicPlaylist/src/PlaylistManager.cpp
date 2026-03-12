@@ -43,10 +43,21 @@ void PlaylistManager::addSongToPlaylist(const QString& playlistName,Song* newSon
 		createPlaylist(playlistName);
 	}
 
+
 	m_allPlaylists[playlistName].append(newSong);
 
 	emit playlistNamesChanged();
 	saveToFile();
+}
+
+void PlaylistManager::clearPlaylistSongs(const QString& playlistName) {
+
+	qDeleteAll(m_allPlaylists[playlistName]);
+	m_allPlaylists[playlistName].clear();
+
+	saveToFile();
+
+	emit playlistNamesChanged();
 }
 
 bool PlaylistManager::checkPlaylist(const QString& playlistName) {

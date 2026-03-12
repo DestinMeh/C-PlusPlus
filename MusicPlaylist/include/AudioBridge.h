@@ -18,8 +18,8 @@ class AudioBridge : public QObject {
 
     //Properties
     Q_PROPERTY(PlaylistManager* playlistManager READ playlistManager CONSTANT)
-    Q_PROPERTY(QList<Song*> currentPlaylistObjects READ getCurrentPlaylistObjects NOTIFY playlistObjectChanged)
-    Q_PROPERTY(QStringList currentPlaylist READ getCurrentPlaylist NOTIFY playlistChanged)
+    Q_PROPERTY(QList<Song*> currentPlaylistSongs READ getCurrentPlaylistSongs NOTIFY playlistSongsChanged)
+    Q_PROPERTY(QString currentPlaylistName READ getCurrentPlaylistName NOTIFY playlistNameChanged)
     Q_PROPERTY(QString currentSongTitle READ getCurrentSongTitle NOTIFY songTitleChanged) // like like instance variable
     Q_PROPERTY(float volume READ volume WRITE setVolume NOTIFY volumeChanged)
     Q_PROPERTY(float songPosition READ songPosition NOTIFY songPositionChanged)
@@ -48,8 +48,8 @@ public:
 
 
     PlaylistManager* playlistManager() { return &m_playlistManager; }
-    QList<Song*> getCurrentPlaylistObjects() { return m_currentPlaylistObjects;  }
-    QStringList getCurrentPlaylist() const { return m_currentPlaylist; }
+    QList<Song*> getCurrentPlaylistSongs() { return m_currentPlaylistSongs; }
+    QString getCurrentPlaylistName() { return m_currentPlaylistName; }
     QString getCurrentSongTitle() const { return m_currentSong; }
     float volume() const { return m_volume; }
     float songPosition() const { return m_songPosition; }
@@ -57,15 +57,13 @@ public:
 
 
 signals:
-    
     void songTitleChanged();
     void volumeChanged();
     void songPositionChanged();
     void songDurationChanged();
     void playlistManagerChanged();
-
-    void playlistObjectChanged();
-    void playlistChanged();
+    void playlistNameChanged();
+    void playlistSongsChanged();
     
 
 private:
@@ -75,8 +73,8 @@ private:
 
     //songs and playlist object instance
     PlaylistManager m_playlistManager;
-    QList<Song*> m_currentPlaylistObjects;
-    QStringList m_currentPlaylist;
+    QString m_currentPlaylistName;
+    QList<Song*> m_currentPlaylistSongs;
     QString m_currentSong;
     ma_sound m_currentSound;
 
