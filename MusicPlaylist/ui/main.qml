@@ -7,235 +7,241 @@ import "Helpers.js" as Logic
 
 
 ApplicationWindow {
+    id:window
     visible: true
     width: 640
-    height: 480
-    title: "Music Player"
+    height: 400
+    title: "Music Ahh player"
 
-    Row{
+    // --- COLOR PALETTE ---
+    readonly property color colorBg: "#121212"
+    readonly property color colorSidebar: "#1e1e1e"
+    readonly property color colorCard: "#282828"
+    readonly property color colorAccent: "#1DB954" // Spotify Green
+    readonly property color colorText: "#FFFFFF"
+    readonly property color colorTextDim: "#B3B3B3"
+
+    background: Rectangle { color: colorBg }
+
+    RowLayout{
         anchors.fill: parent
+        spacing: 0
 
-        Column{
-            width: parent.width * 0.3
-            Rectangle{
-                width: parent.width ; 
-                height: 200
-          
-                border.color: "black"
-                clip: true
-                ListView{
+        // ---- SideBar ---
+
+        Rectangle{
+            Layout.fillHeight: true
+            Layout.preferredWidth: parent.width * 0.25
+            color: colorSidebar
+
+            ColumnLayout{
+                anchors.fill: parent
+                anchors.margins: 15
+                spacing: 15
+
+                Text{
+                    text: "Library"
+                    color: colorText
+                    font.pixelSize: 20
+                    // font.bold:True
+                }
+
+                ListView {
                     id: playlistManager
-                    anchors.fill: parent
-                    model: myAudioPlayer.playlistManager.playlistNames     
-   
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    model: myAudioPlayer.playlistManager.playlistNames
+                    spacing: 4
+                    clip: true
 
                     delegate: ItemDelegate{
-                        id: playlistDelegate
                         width: playlistManager.width
-                    
+                        height: 40
+
+                        background: Rectangle{
+                            radius: 6
+                            color: myAudioPlayer.currentPlaylistName === modelData ?
+                                       Qt.rgba(1, 1, 1, 0.1) : "transparent"
+                        }
+
                         contentItem: Text{
                             text: modelData
-                            color: "black"
-                            leftPadding: 10
+                            color: myAudioPlayer.currentPlaylistName === modelData ?
+                                       colorAccent : colorTextDim
+                            font.pixelSize: 14
+                            verticalAlignment: Text.AlignVCenter
+                            leftPadding:10
                         }
-                    
+
                         onClicked: myAudioPlayer.loadPlaylist(modelData)
 
-                        MouseArea{
+                        MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
                             onClicked: (mouse) => {
-                                if(mouse.button === Qt.RightButton) {
-                                    contextMenu.playlistNameToDelete = modelData
-                                    contextMenu.popup()
-                                }
-                            }
+                                           if(mouse.button === Qt.RightButton) {
+                                               contextMenu.playlistNameToDelete = modelData
+                                               contetMenu.popup()
+                                           }
+                                       }
                         }
                     }
                 }
-            }
 
-            Menu {
-                id: contextMenu
-                property string playlistNameToDelete: ""
+                Button {
+                    Layout.fillWidth: true
+                    text: "+ New Playlist"
+                    onClicked: addPlaylistDialog.open()
 
-                MenuItem {
-                    text: "Delete Playlist"
-                    onTriggered: {
-                        myAudioPlayer.playlistManager.deletePlaylist(contextMenu.playlistNameToDelete)
+                    background: Rectangle{
+                        radius:10
+                        color: parent.down ? "#1AA34A" : colorAccent
+                    }
+
+                    contentItem: Text {
+                        text: parent.text
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        font.bold: true
                     }
                 }
             }
-    
-            Button{
-                text: "Add Playlist"
-                onClicked: addPlaylistDialog.open()
-            }
-            
-            Dialog{
-                id: addPlaylistDialog
-                title: "Create New Playlist"
-                standardButtons: Dialog.Ok  | Dialog.Cancel
-                anchors.centerIn: parent
-
-                property bool nameExists: myAudioPlayer.playlistManager.checkPlaylist(newNameField.text)
-                
-                Column {
-                    spacing: 10
-                    Text { text: "Playlist Name:"}
-                    TextField{
-                        id: newNameField
-                        placeholderText: "Enter name..."    
-                        width: 150
-
-                        background: Rectangle{
-                            border.color: addPlaylistDialog.nameExists ? "red" : "gray"
-                            border.width: 1
-                        }
-                    }
-                    
-                    Text {
-                        text: "That playlist name already exists!"
-                        color: "red"
-                        visible: addPlaylistDialog.nameExists   
-                        font.pixelSize: 11
-                    }
-                }
-                
-                Component.onCompleted: {
-                    standardButton(Dialog.Ok).enabled = Qt.binding(function() { 
-                        return newNameField.text.length > 0 && !addPlaylistDialog.nameExists 
-                    })
-                }
-            
-                onAccepted: {
-                    myAudioPlayer.playlistManager.createPlaylist(newNameField.text)
-                    newNameField.text = ""
-                }
-            }
-        
         }
-        Column{
-            width: parent.width * 0.7
-            spacing: 10
-        
-            Text{
-                text: myAudioPlayer.currentPlaylistName
-                font.pixelSize: 15
+
+        // -- Main Content Area --
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins: 25
+            spacing: 20
+
+            // Playlist Header
+            Text {
+                text: myAudioPlayer.currentPlaylistName || "No Playlist Selected"
+                color: colorText
+                font.pixelSize: 32
+                font.bold: true
             }
 
+            // Song List Card
             Rectangle{
-                width: parent.width ; height: 200
-          
-                border.color: "black"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: colorCard
+                radius: 5
                 clip: true
+
                 ListView{
                     id: playlistView
                     anchors.fill: parent
-                    model: myAudioPlayer.currentPlaylistSongs     
-   
-
-
+                    anchors.margins: 5
+                    model: myAudioPlayer.currentPlaylistSongs
                     delegate: ItemDelegate{
                         width: playlistView.width
-                    
-                        contentItem: Text{
-                            text: modelData.title
-                            color: "black"
-                            leftPadding: 10
+                        contentItem: RowLayout {
+                            Text{
+                                text: modelData.title
+                                color: colorText
+                                Layout.fillWidth: true
+                                leftPadding: 10
+                            }
                         }
-                    
                         onClicked: myAudioPlayer.playFromPlaylist(index)
                     }
                 }
             }
 
-            Button{
-                text: "Clear Playlist"
-                onClicked: myAudioPlayer.clearPlaylist()
-            }
+            // --- player controls section --
+            ColumnLayout{
+                Layout.fillWidth: true
+                spacing : 10
 
-            Text {
-                text: "Playing: " + myAudioPlayer.currentSongTitle
-                font.pixelSize: 10
-                color: "black"
-            }
-        
-            Row{
-                spacing: 5
-                
-                Button {
-                    text: "Play/Stop"
-                    onClicked: myAudioPlayer.togglePlay()
-                }
-        
- 
+                Text{
+                    text: myAudioPlayer.currentSongTitle ? "Now Playing: " + myAudioPlayer.currentSongTitle : "Select a song"
+                    color: colorAccent
+                    font.pixelSize: 14
+                    Layout.alignment: Qt.AlignHCenter
 
-                FileDialog {
-                    id: filePicker
-                    title: "Select a Song"
-                    currentFolder: StandardPaths.writableLocation(StandardPaths.MusicLocation)
-                    onAccepted: {
-                        myAudioPlayer.addToPlaylist(filePicker.selectedFile)
-                    }
                 }
 
-
-                Button {
-                    text: "Shuffle"
-                    onClicked: myAudioPlayer.shuffle()
-                }
-
-                Button {
-                    text: "Add Song to Playlist"
-                    onClicked: filePicker.open()
-                }
-            }
-
-            Column{
-                width: parent.width
-                spacing: 5
-              
-
-                Slider {
+                // progress bar
+                Slider{
                     id: progressSlider
-                    width: parent.width
-                    
+                    Layout.fillWidth: true
                     from: 0
                     to: myAudioPlayer.songDuration
                     value: myAudioPlayer.songPosition
 
-                    onPressedChanged:{
-                        if (!pressed){
-                            myAudioPlayer.seek(value)
+                    background: Rectangle{
+                        height: 4
+                        width: progressSlider.availableWidth
+                        y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                        radius: 2
+                        color: "#404040"
+                        Rectangle{
+                            width: progressSlider.visualPosition * parent.width
+                            height: parent.height
+                            color: colorAccent
+                            radius: 2
                         }
+
                     }
+
+                    onPressedChanged: if (!pressed) myAudioPlayer.seek(value)
                 }
-    
+
                 RowLayout {
-                    width: parent.width
-
-                    Text { text: Logic.formatTime(myAudioPlayer.songPosition) }
+                    Layout.fillWidth: true
+                    Text { text: Logic.formatTime(myAudioPlayer.songPosition); color: colorTextDim; font.pixelSize: 12 }
                     Item { Layout.fillWidth: true }
-                    Text { text: Logic.formatTime(myAudioPlayer.songDuration) }
+                    Text { text: Logic.formatTime(myAudioPlayer.songDuration); color: colorTextDim; font.pixelSize: 12 }
                 }
-            }
-    
-            Row {
-                spacing: 10
-                Text { text: "volume: "; font.pixelSize: 15}
 
-                Slider {
-                    id: volumeSlider
-                    from: 0.0
-                    to: 1.0
-                    value: myAudioPlayer.volume
+                // Control Buttons
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 20
 
-                    onMoved: {
-                        myAudioPlayer.setVolume(value)
+                    Button {
+                        text: "Shuffle"
+                        flat: true
+                        onClicked: myAudioPlayer.shuffle()
+                    }
+
+                    RoundButton {
+                        width: 60; height: 60
+                        text: myAudioPlayer.isPlaying ? "Pause" : "Play"
+                        palette.button: colorText
+                        palette.buttonText: "black"
+                        font.bold: true
+                        onClicked: myAudioPlayer.togglePlay()
+                    }
+
+                    Button {
+                        text: "Add Song"
+                        onClicked: filePicker.open()
+                    }
+
+                    Button {
+                        text: "Clear"
+                        onClicked: myAudioPlayer.clearPlaylist()
+                    }
+                }
+
+                // Volume Slider
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 10
+                    Text { text: "Vol"; color: colorTextDim }
+                    Slider {
+                        id: volumeSlider
+                        from: 0.0; to: 1.0; value: myAudioPlayer.volume
+                        onMoved: myAudioPlayer.setVolume(value)
                     }
                 }
             }
-        }  
+        }
+
+
     } 
 }
